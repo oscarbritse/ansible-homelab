@@ -1,0 +1,172 @@
+# install docker
+# install packages to allow apt to use a repository over https
+- name: Install Docker required packages
+  tags: docker
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - gnupg
+    state: latest
+    update_cache: true
+
+# curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+- name: Add Docker GPG signing key
+  tags: docker
+  ansible.builtin.apt_key:
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    state: present
+
+# apt-key fingerprint
+- name: Verify that we have the key with the fingerprint
+  tags: docker
+  apt_key:
+    id: 0EBFCD88
+    state: present
+
+# add-apt-repository
+- name: Add repository into sources list
+  tags: docker
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ ansible_architecture }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+
+# apt-get update and install docker latetst verion
+- name: Install Docker
+  tags: docker
+  ansible.builtin.apt:
+    name:
+      - docker
+      - docker.io
+      - docker-compose
+      - docker-registry
+    state: latest
+    update_cache: true
+
+# optional you may to add your user to docker group 
+# sudo groupadd docker
+- name: Create "docker" group
+  tags: docker
+  group:
+    name: "{{ docker_group }}"
+    state: present
+
+# sudo usermod -aG docker <username>
+- name: Add remote user to "docker" group
+  tags: docker
+  user:
+    name: "{{ remote_user }}"
+    groups: "{{ docker_group }}"
+    append: yes
+
+# add config files for docker containers
+- name: Create sync directory
+  tags: docker
+  file:
+    path: "{{ docker_config_directory }}"
+    state: directory
+
+- name: Sync Docker files
+  tags: docker
+  synchronize:
+    src: files/docker/
+    dest: "{{ docker_config_directory }}"
+    rsync_opts:
+      - '--include=*.yml'
+      - '--include=*.png'
+      - '--include=*.svg'
+      - '--include=*.css'
+      - '--include=*' # include all file types (favicons etc)
+      - '--include=*/'
+      # - '--exclude=*'
+
+- name: Set permissions for Prometheus data
+  ansible.builtin.file:
+    path: "{{ docker_config_directory }}/monitoring/prometheus/"
+    recurse: true
+    owner: 65534
+    group: 65534
+
+- name: Set permissions for Grafana data
+  ansible.builtin.file:
+    path: "{{ docker_config_directory }}/monitoring/grafana/"
+    recurse: true
+    owner: 472
+    group: 472
+
+# add fancy motd
+- name: Delete motd file
+  tags: motd
+  ansible.builtin.file:
+    path: /etc/motd
+    state: absent
+
+- name: Delete update motd file
+  tags: motd
+  ansible.builtin.file:
+    path: /etc/update-motd.d/10-uname
+    state: absent
+
+- name: Install motd required packages
+  tags: motd
+  ansible.builtin.apt:
+    name:
+      - figlet
+      - lolcat
+      - hddtemp
+    state: latest
+    update_cache: true
+
+- name: Copy motd file
+  tags: motd
+  copy:
+    src: files/motd/motd.sh
+    dest: /etc/profile.d
+    owner: root
+    group: root
+    mode: 0644
+
+# sudo usermod -aG video <username>
+# required to be able to run vcgencmd
+- name: Add remote user to "video" group
+  tags: motd
+  user:
+    name: "{{ remote_user }}"
+    groups: video
+    append: yes
+
+# add fail2ban
+- name: Install fail2ban package
+  tags: fail2ban
+  ansible.builtin.apt:
+    name:
+      - fail2ban
+    state: latest
+    update_cache: true
+
+- name: Copy fail2ban config file
+  tags: fail2ban
+  copy:
+    src: files/fail2ban/jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_fail2ban
+
+
+# required to be able to run fail2ban status commands for stats in motd
+- name: Change fail2ban privileges + sticky bit
+  tags: fail2ban
+  ansible.builtin.file:
+    path: /var/run/fail2ban/fail2ban.sock
+    mode: u=rwx,g=rw,o=rw,g+t
+
+# required to be able to run fail2ban commands for stats in motd
+- name: Change fail2ban log privileges
+  tags: fail2ban
+  ansible.builtin.file:
+    path: /var/log/fail2ban.log
+    mode: u=rw,g=r,o=r

@@ -1,0 +1,14 @@
+[sshd]
+enabled = true
+filter = sshd
+port = ssh
+# ban the user that triggered the filter and restrict them from accessing any ports on the device
+banaction = iptables-multiport
+# the length of time between login attempts for maxretry
+findtime = 600
+# the number of seconds that a host is banned for
+bantime = 3600
+# number of attempts from a single ip before a ban is imposed
+maxretry = 5
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s

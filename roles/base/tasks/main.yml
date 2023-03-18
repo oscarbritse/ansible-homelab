@@ -1,0 +1,18 @@
+- name: Add ssh key for admin
+  authorized_key:
+    user: "{{ remote_user }}"
+    key: "{{ lookup('file', 'files/raspberry_pi.pub') }}"
+
+- name: Generate sshd_config file from template
+  template:
+    src: "{{ ssh_template_file }}"
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_sshd
+
+- name: Delete sudoers file for default pi user
+  ansible.builtin.file:
+    path: /etc/sudoers.d/010_pi-nopasswd
+    state: absent

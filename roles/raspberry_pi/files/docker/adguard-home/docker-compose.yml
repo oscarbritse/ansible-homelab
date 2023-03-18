@@ -1,0 +1,22 @@
+version: "3.2"
+
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguard-home
+    restart: unless-stopped
+    ports:
+      - 53:53/tcp # plain DNS
+      - 53:53/udp
+      - 853:853/tcp # add if you are going to run AdGuard Home as a DNS-over-TLS server
+      - 784:784/udp
+      - 3002:3000/tcp
+      - 80:80/tcp # add if you are going to use AdGuard Home's admin panel
+      - 443:443/tcp
+    volumes:
+      - type: bind
+        source: ./work
+        target: /opt/adguardhome/work
+      - type: bind
+        source: ./conf
+        target: /opt/adguardhome/conf

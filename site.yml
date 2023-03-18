@@ -1,0 +1,22 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: Update repository index (Debian)
+    tags: always
+    apt:
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Debian"
+
+- hosts: all
+  become: true
+  roles:
+    - base
+
+- hosts: raspberry_pi
+  become: true
+  roles:
+    - raspberry_pi

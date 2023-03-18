@@ -1,0 +1,59 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: Install updates (Debian)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Debian"
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Create admin user
+    tags: always
+    user:
+      name: admin
+      groups: root
+
+  - name: Add ssh key for admin
+    tags: always
+    authorized_key:
+      user: admin
+      key: "{{ lookup('file', 'files/raspberry_pi.pub') }}"
+
+  - name: Add sudoers file for admin
+    tags: always
+    copy:
+      src: sudoer_admin
+      dest: /etc/sudoers.d/admin
+      owner: root
+      group: root
+      mode: 0440
+
+  # init tasks
+  - name: Copy init scripts
+    tags: init
+    copy:
+      src: files/init/
+      dest: "/home/{{ remote_user }}/init"
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Configure locale
+    tags: init
+    shell: "/home/{{ remote_user }}/init/configure-locale.sh"
+
+  - name: Set timezone
+    tags: init
+    shell: "/home/{{ remote_user }}/init/set-timezone.sh"
+
+  - name: Set keyboard layout
+    tags: init
+    shell: /home/{{ remote_user }}/init/set-keyboard-layout.sh

@@ -6,19 +6,19 @@ Setup and configure a homelab on a Raspberry Pi using Ansible.
 
 * Ansible installed on your local machine
 * A running Raspberry Pi
-* Private ssh key (`.pem` file) for the Raspberry Pi
+* An SSH key pair on your local machine
 
 ## Steps
 
 * Generate an ssh key pair for Raspberry Pi
-`ssh-keygen -t ed25519 -C "raspberry-pi"`
+`ssh-keygen -t ed25519 -C "raspberry pi"`
 
 * In Raspberry Pi Imager, go to `Advanced options` and choose `"Allow public-key authentication only"`
 
 * Paste the public ssh key in `"Set authorized_keys for 'admin'"` box
 
 * Connect via ssh and specify the private key
-`ssh -i raspberry-pi admin@<ip-address>`
+`ssh -i raspberry_pi admin@<ip-address>`
 
 * Now you can reconnect without specifying the private key
 

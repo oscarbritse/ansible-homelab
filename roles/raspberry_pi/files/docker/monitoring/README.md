@@ -61,12 +61,3 @@ If you would like to install this dashboard from Grafana.com, simply follow the 
 Or you can follow the steps described in the [Grafana Documentation](https://grafana.com/docs/grafana/latest/dashboards/manage-dashboards/#import-a-dashboard).
 
 This dashboard is intended to help you get started with monitoring your Raspberry PI devices.
-
-## Troubleshooting
-
-Enable `c-group` memory and swap accounting on the host machine by running the following command:
-```bash
-sudo sed -i 's/^GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cgroup_enable=memory cgroup_memory=1 swapaccount=1"/' /etc/default/grub
-sudo update-grub
-sudo reboot
-```

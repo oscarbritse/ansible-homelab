@@ -66,7 +66,7 @@ The following commands are useful on the ansible host (typically your local mach
 `ssh-add -D`
 
 * Delete a specific identity (key) from the ssh agent
-`ssh-add -d ~/.ssh/raspberry-pi.pub`
+`ssh-add -d ~/.ssh/raspberry_pi.pub`
 
 # Resources
 

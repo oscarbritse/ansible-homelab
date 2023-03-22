@@ -19,8 +19,8 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: "Europe/Stockholm"
-      MEM_LIMIT: 512 # optional
-      MEM_STARTUP: 512 # optional
+      MEM_LIMIT: 1024 # optional
+      MEM_STARTUP: 1024 # optional
     volumes:
       - type: bind
         source: ./config

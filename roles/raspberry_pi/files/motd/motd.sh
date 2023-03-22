@@ -28,26 +28,27 @@ W="\e[0;39m"
 G="\e[1;32m"
 
 echo -e "
-${W}system info:
-$W  Hostname....: $W`uname -n`
-$W  Model.......: $W`tr -d '\0' </proc/device-tree/model | awk '{print $0}'`
-$W  Distro......: $W`cat /etc/*release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
-$W  Kernel......: $W`uname -sr`
-$W  Architecture: $W`uname -m`
+${W}system:
+$W  host........: $W`uname -n`
+$W  model.......: $W`tr -d '\0' </proc/device-tree/model | awk '{print $0}'`
+$W  distro......: $W`cat /etc/*release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
+$W  kernel......: $W`uname -sr`
+$W  arch........: $W`uname -m`
 
-$W  IP LAN......: $W`ifconfig wlan0 | sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p"`
-$W  Last Login..: $W`last --time-format iso -2 | awk 'NR==2 { print $1" | "$4" | "$3 }'`
-$W  Time........: $W`(date +"%Y-%m-%d %T")` $TIME_ZONE
-$W  Uptime......: $W`uptime -p`
+$W  ip lan......: $W`ifconfig wlan0 | sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p"`
+$W  last login..: $W`last --time-format iso -2 | awk 'NR==2 { print $1" | "$4" | "$3 }'`
+$W  time........: $W`(date +"%Y-%m-%d %T")` $TIME_ZONE
+$W  uptime......: $W`uptime -p`
 
-$W  CPU Temp....: $W$CPU_TEMP_1.$CPU_TEMP_M°C
-$W  GPU Temp....: $W`(vcgencmd measure_temp | cut -c "6-9")`ºC
+${W}resources:
+$W  cpu temp....: $G$CPU_TEMP_1.$CPU_TEMP_M$W°C
+$W  gpu temp....: $G`(vcgencmd measure_temp | cut -c "6-9")`$WºC
 
-$W  Load........: $G$LOAD1$W (1m), $G$LOAD5$W (5m), $G$LOAD15$W (15m)
-$W  Processes...:$W $G$PROCESS_ROOT$W (root), $G$PROCESS_USER$W (user), $G$PROCESS_ALL$W (total)
+$W  load........: $G$LOAD1$W (1m), $G$LOAD5$W (5m), $G$LOAD15$W (15m)
+$W  processes...:$W $G$PROCESS_ROOT$W (root), $G$PROCESS_USER$W (user), $G$PROCESS_ALL$W (total)
 
-$W  CPU.........: $W$PROCESSOR_NAME ($G$PROCESSOR_COUNT$W vCPU)
-$W  Memory......: $G$USED$W used, $G$AVAIL$W avail, $G$TOTAL$W total$W"
+$W  cpu.........: $W$PROCESSOR_NAME ($G$PROCESSOR_COUNT$W vCPU)
+$W  memory......: $G$USED$W used, $G$AVAIL$W avail, $G$TOTAL$W total$W"
 
 # 35-diskspace.sh
 # config
@@ -62,7 +63,7 @@ undim="\e[0m"
 
 # disk usage: ignore zfs, squashfs & tmpfs
 mapfile -t dfs < <(df -H -x zfs -x squashfs -x tmpfs -x devtmpfs -x overlay --output=target,pcent,size | tail -n+2)
-printf "\ndisk usage:\n"
+printf "\ndisk:\n"
 
 for line in "${dfs[@]}"; do
     # get disk usage

@@ -144,7 +144,7 @@ for jail in ${jails[@]}; do
     out+="$jail,$failed,$totalfailed,$banned,$totalbanned\n"
 done
 
-printf "\nfail2ban status:\n"
+printf "\nfail2ban:\n"
 printf $out | column -ts $',' | sed -e 's/^/  /'
 
 # 50-fail2ban.sh
@@ -165,7 +165,7 @@ for jail in ${jails[@]}; do
     out+=$(printf "$jail, %+3s bans, %+3s unbans, %+3s active" $bans $unbans $diff)"\n"
 done
 
-printf "\nfail2ban status (monthly):\n"
+printf "\nfail2ban (monthly):\n"
 printf "$out" | column -ts $',' | sed -e 's/^/  /'
 
 # 60-docker.sh
@@ -194,5 +194,5 @@ for i in "${!containers[@]}"; do
 done
 out+="\n"
 
-printf "\ndocker status:\n"
+printf "\ndocker:\n"
 printf "$out" | column -ts $',' | sed -e 's/^/  /'

@@ -5,6 +5,9 @@ services:
     image: containrrr/watchtower:latest
     container_name: watchtower
     restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     volumes:
       - type: bind
         source: /var/run/docker.sock

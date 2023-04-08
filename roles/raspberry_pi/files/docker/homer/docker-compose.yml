@@ -5,6 +5,9 @@ services:
     image: b4bz/homer:latest
     container_name: homer
     restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     ports:
       - 8081:8080
     user: 1000:1000 # default

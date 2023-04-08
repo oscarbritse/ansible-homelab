@@ -2,15 +2,17 @@ version: "3"
 
 services:
   grafana:
-    container_name: monitoring-grafana
+    container_name: grafana
     image: grafana/grafana:latest
-    hostname: rpi-grafana
     restart: unless-stopped
     user: "472"
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     networks:
       - internal
     ports:
-      - "3000:3000"
+      - 3000:3000
     env_file:
       - ./grafana/.env
     volumes:
@@ -18,13 +20,38 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
+      - loki
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    user: "nobody"
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
+    networks:
+      - internal
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    expose:
+      - 9090
+    volumes:
+      - ./prometheus/data:/prometheus
+      - ./prometheus:/etc/prometheus/
+    depends_on:
+      - cadvisor
+      - node-exporter
 
   cadvisor:
-    container_name: monitoring-cadvisor
+    container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor:v0.47.0
-    hostname: rpi-cadvisor
     restart: unless-stopped
     privileged: true
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     networks:
       - internal
     expose:
@@ -40,10 +67,12 @@ services:
       - /etc/machine-id:/etc/machine-id:ro
 
   node-exporter:
-    container_name: monitoring-node-exporter
+    container_name: node-exporter
     image: prom/node-exporter:latest
-    hostname: rpi-exporter
     restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     networks:
       - internal
     expose:
@@ -60,28 +89,37 @@ services:
       - /:/rootfs:ro
       - /:/host:ro,rslave
 
-  prometheus:
-    container_name: monitoring-prometheus
-    image: prom/prometheus:latest
-    hostname: rpi-prometheus
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
     restart: unless-stopped
-    user: "nobody"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     networks:
       - internal
-    expose:
-      - 9090
+    ports:
+      - 3100:3100
+    command:
+      - '--config.file=/etc/loki/local-config.yaml'
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
+    networks:
+      - internal
     volumes:
-      - ./prometheus/data:/prometheus
-      - ./prometheus:/etc/prometheus/
+      - ./promtail/promtail.yml:/etc/promtail/docker-config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: 
+      - '--config.file=/etc/promtail/docker-config.yml'
     depends_on:
-      - cadvisor
-      - node-exporter
-    links:
-      - cadvisor:cadvisor
-      - node-exporter:node-exporter
+      - loki
 
 networks:
   internal:

@@ -5,6 +5,9 @@ services:
     image: adguard/adguardhome:latest
     container_name: adguard-home
     restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
     ports:
       - 53:53/tcp # plain DNS
       - 53:53/udp

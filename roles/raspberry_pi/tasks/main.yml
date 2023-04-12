@@ -144,37 +144,3 @@
     name: "{{ remote_user }}"
     groups: video
     append: yes
-
-# add fail2ban
-- name: Install fail2ban package
-  tags: fail2ban
-  ansible.builtin.apt:
-    name:
-      - fail2ban
-    state: latest
-    update_cache: true
-
-- name: Copy fail2ban config file
-  tags: fail2ban
-  copy:
-    src: files/fail2ban/jail.local
-    dest: /etc/fail2ban/jail.local
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart_fail2ban
-
-
-# required to be able to run fail2ban status commands for stats in motd
-- name: Change fail2ban privileges + sticky bit
-  tags: fail2ban
-  ansible.builtin.file:
-    path: /var/run/fail2ban/fail2ban.sock
-    mode: u=rwx,g=rw,o=rw,g+t
-
-# required to be able to run fail2ban commands for stats in motd
-- name: Change fail2ban log privileges
-  tags: fail2ban
-  ansible.builtin.file:
-    path: /var/log/fail2ban.log
-    mode: u=rw,g=r,o=r

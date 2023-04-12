@@ -1,0 +1,21 @@
+version: "3.6"
+
+services:
+  fail2ban:
+    container_name: fail2ban
+    image: lscr.io/linuxserver/fail2ban:latest
+    restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config:/config
+      - /var/log:/var/log:ro

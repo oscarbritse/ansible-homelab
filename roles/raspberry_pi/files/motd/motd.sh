@@ -99,7 +99,7 @@ green="\e[1;32m"
 red="\e[1;31m"
 undim="\e[0m"
 
-services=("fail2ban")
+services=("")
 # sort services
 IFS=$'\n' services=($(sort <<<"${services[*]}"))
 unset IFS
@@ -126,46 +126,6 @@ done
 out+="\n"
 
 printf "\nservices:\n"
-printf "$out" | column -ts $',' | sed -e 's/^/  /'
-
-# 50-fail2ban-status.sh
-# fail2ban-client status to get all jails, takes about ~70ms
-jails=($(fail2ban-client status | grep "Jail list:" | sed "s/ //g" | awk '{split($2,a,",");for(i in a) print a[i]}'))
-
-out="jail,failed,total,banned,total\n"
-
-for jail in ${jails[@]}; do
-    # slow because fail2ban-client has to be called for every jail (~70ms per jail)
-    status=$(fail2ban-client status ${jail})
-    failed=$(echo "$status" | grep -ioP '(?<=Currently failed:\t)[[:digit:]]+')
-    totalfailed=$(echo "$status" | grep -ioP '(?<=Total failed:\t)[[:digit:]]+')
-    banned=$(echo "$status" | grep -ioP '(?<=Currently banned:\t)[[:digit:]]+')
-    totalbanned=$(echo "$status" | grep -ioP '(?<=Total banned:\t)[[:digit:]]+')
-    out+="$jail,$failed,$totalfailed,$banned,$totalbanned\n"
-done
-
-printf "\nfail2ban:\n"
-printf $out | column -ts $',' | sed -e 's/^/  /'
-
-# 50-fail2ban.sh
-logfile='/var/log/fail2ban.log*'
-mapfile -t lines < <(grep -hioP '(\[[a-z-]+\]) ?(?:restore)? (ban|unban)' $logfile | sort | uniq -c)
-jails=($(printf -- '%s\n' "${lines[@]}" | grep -oP '\[\K[^\]]+' | sort | uniq))
-
-out=""
-for jail in ${jails[@]}; do
-    bans=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] ban" | awk '{print $1}')
-    restores=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] restore ban" | awk '{print $1}')
-    unbans=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] unban" | awk '{print $1}')
-    bans=${bans:-0} # default value
-    restores=${restores:-0} # default value
-    unbans=${unbans:-0} # default value
-    bans=$(($bans+$restores))
-    diff=$(($bans-$unbans))
-    out+=$(printf "$jail, %+3s bans, %+3s unbans, %+3s active" $bans $unbans $diff)"\n"
-done
-
-printf "\nfail2ban (monthly):\n"
 printf "$out" | column -ts $',' | sed -e 's/^/  /'
 
 # 60-docker.sh

@@ -1,0 +1,18 @@
+version: "3.6"
+
+services:
+  minecraft-server:
+    image: itzg/minecraft-server:latest
+    container_name: minecraft-server
+    restart: unless-stopped
+    labels:
+      logging: "promtail"
+      logging_jobname: "container_logs"
+    tty: true
+    stdin_open: true
+    ports:
+      - 25565:25565
+    environment:
+      EULA: "TRUE"
+    volumes:
+      - ./data:/data

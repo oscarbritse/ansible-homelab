@@ -37,3 +37,12 @@ scrape_configs:
             #message: message
             level: level
             #output: 'message'
+
+  - job_name: system
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        instance: raspberrypi
+        job: secure
+        __path__: /var/log/secure

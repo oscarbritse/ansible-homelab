@@ -21,7 +21,7 @@
       }
     ]
   },
-  "description": "Dashboard with details of the Docker containers and host metrics for Raspberry Pi.",
+  "description": "Dashboard for Raspberry Pi system metrics and Docker containers",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 10566,
@@ -40,7 +40,7 @@
       },
       "id": 66,
       "panels": [],
-      "title": "Quick CPU / Mem / Disk",
+      "title": "System CPU | Memory | Disk",
       "type": "row"
     },
     {
@@ -574,7 +574,7 @@
           "step": 1800
         }
       ],
-      "title": "Temp",
+      "title": "Temperature",
       "type": "gauge"
     },
     {
@@ -1071,7 +1071,7 @@
       },
       "id": 78,
       "panels": [],
-      "title": "Basic CPU / Mem / Net / Disk",
+      "title": "System CPU | Memory | Network | Disk",
       "type": "row"
     },
     {
@@ -1415,7 +1415,7 @@
         }
       ],
       "thresholds": [],
-      "title": "Used Disk Space",
+      "title": "Disk Space Usage",
       "type": "timeseries"
     },
     {
@@ -1868,7 +1868,7 @@
           "refId": "C"
         }
       ],
-      "title": "Disk IO",
+      "title": "Disk I/O",
       "type": "timeseries"
     },
     {
@@ -1993,7 +1993,7 @@
         }
       ],
       "thresholds": [],
-      "title": "Used Memory",
+      "title": "Memory Usage",
       "type": "timeseries"
     },
     {
@@ -2136,7 +2136,7 @@
       },
       "id": 80,
       "panels": [],
-      "title": "Docker Engine",
+      "title": "Containers",
       "type": "row"
     },
     {
@@ -2349,7 +2349,7 @@
           "refId": "B"
         }
       ],
-      "title": "Used Memory",
+      "title": "Memory Usage",
       "type": "timeseries"
     },
     {
@@ -2561,7 +2561,7 @@
           "refId": "A"
         }
       ],
-      "title": "Received Network Traffic",
+      "title": "Network Traffic Received",
       "type": "timeseries"
     },
     {
@@ -2658,7 +2658,7 @@
           "refId": "A"
         }
       ],
-      "title": "Sent Network Traffic",
+      "title": "Network Traffic Sent",
       "type": "timeseries"
     },
     {
@@ -2754,7 +2754,7 @@
           "refId": "A"
         }
       ],
-      "title": "I/O Rx FS",
+      "title": "I/O Received FS",
       "type": "timeseries"
     },
     {
@@ -2850,7 +2850,7 @@
           "refId": "A"
         }
       ],
-      "title": "I/O Tx FS",
+      "title": "I/O Transmitted FS",
       "type": "timeseries"
     },
     {
@@ -2956,20 +2956,19 @@
           "refId": "A"
         }
       ],
-      "title": "Containers Info",
+      "title": "Containers",
       "transformations": [
         {
           "id": "filterFieldsByName",
           "options": {
             "include": {
               "names": [
-                "container_label_com_docker_compose_project",
-                "container_label_com_docker_compose_project_working_dir",
-                "image",
-                "instance",
                 "name",
-                "Value",
-                "container_label_com_docker_compose_service"
+                "container_label_com_docker_compose_project",
+                "image",
+                "container_label_com_docker_compose_project_working_dir",
+                "instance",
+                "Value"
               ]
             }
           }
@@ -2981,10 +2980,9 @@
             "indexByName": {},
             "renameByName": {
               "Value": "Running",
-              "container_label_com_docker_compose_project": "Label",
-              "container_label_com_docker_compose_project_working_dir": "Working dir",
-              "container_label_com_docker_compose_service": "Service",
-              "image": "Registry Image",
+              "container_label_com_docker_compose_project": "Stack",
+              "container_label_com_docker_compose_project_working_dir": "Working Directory",
+              "image": "Image",
               "instance": "Instance",
               "name": "Name"
             }
@@ -3031,7 +3029,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Raspberry Pi & Docker Monitoring",
+  "title": "Monitoring | Raspberry Pi & Containers",
   "uid": "VKtkKcAVz",
   "version": 2,
   "weekStart": ""

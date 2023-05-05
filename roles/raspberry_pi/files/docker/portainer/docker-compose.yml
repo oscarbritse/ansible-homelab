@@ -2,12 +2,12 @@ version: "3.6"
 
 services:
   portainer:
-    image: portainer/portainer-ce:2.18.1
+    image: portainer/portainer-ce:latest
     container_name: portainer
     labels:
       logging: "promtail"
-      logging_jobname: "container_logs" 
-      com.centurylinklabs.watchtower.monitor-only: true
+      logging_jobname: "container_logs"
+      # com.centurylinklabs.watchtower.monitor-only: true
     restart: unless-stopped
     ports:
       - 9000:9000

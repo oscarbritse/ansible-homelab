@@ -4,11 +4,18 @@
   become: true
   pre_tasks:
 
-  - name: Update repository index (Debian)
+  # - name: Update repository index (Debian)
+  #  tags: always
+  #  apt:
+  #    update_cache: yes
+  #  changed_when: false
+  #  when: ansible_distribution == "Debian"
+
+  - name: Install updates (Debian)
     tags: always
     apt:
+      upgrade: dist
       update_cache: yes
-    changed_when: false
     when: ansible_distribution == "Debian"
 
 - hosts: all

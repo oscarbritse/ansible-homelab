@@ -24,6 +24,11 @@ CPU_TEMP_M=$(($CPU_TEMP_2 % $CPU_TEMP_1))
 
 TIME_ZONE=`cat /etc/timezone | awk '{ print $1 }'`
 
+LAST_LOGIN=`last --time-format iso -20 | grep -v "^reboot" | awk 'NR==2 { print $1" "$4" "$3 }'`
+LAST_LOGIN_USER=`echo "$LAST_LOGIN" | awk '{print $1}'`
+LAST_LOGIN_TIME=`echo "$LAST_LOGIN" | awk '{print $2}' | xargs -I{} date -d {} +'%Y-%m-%d %H:%M:%S %Z'`
+LAST_LOGIN_IP_ADDRESS=`echo "$LAST_LOGIN" | awk '{print $3}'`
+
 W="\e[0;39m"
 G="\e[1;32m"
 B="\e[1;39m"
@@ -38,8 +43,8 @@ $W  arch........: $W`uname -m`
 
 ${B}status:
 $W  ip lan......: $W`ifconfig wlan0 | sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p"`
-$W  last login..: $W`last --time-format iso -20 | grep -v "^reboot" | awk 'NR==2 { print $1" | "$4" | "$3 }'`
-$W  time........: $W`(date +"%Y-%m-%d %T")` $TIME_ZONE
+$W  last login..: $W$LAST_LOGIN_USER | $LAST_LOGIN_TIME | $LAST_LOGIN_IP_ADDRESS
+$W  time........: $W`(date +"%Y-%m-%d %T %Z")`
 $W  uptime......: $W`uptime -p`
 
 ${B}resources:

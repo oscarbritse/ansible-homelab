@@ -1,4 +1,4 @@
-- name: Add ssh key for admin
+- name: Add ssh key for admin user
   authorized_key:
     user: "{{ remote_user }}"
     key: "{{ lookup('file', 'files/raspberry_pi.pub') }}"

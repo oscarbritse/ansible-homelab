@@ -11,7 +11,7 @@
   #  changed_when: false
   #  when: ansible_distribution == "Debian"
 
-  - name: Install updates (Debian)
+  - name: Install Debian updates
     tags: always
     apt:
       upgrade: dist

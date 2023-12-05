@@ -15,7 +15,7 @@ services:
       TZ: "Europe/Stockholm"
     volumes:
       - ./config:/config
-    ports:
-      - 8123:8123 #optional
+    # ports:
+    #  - 8123:8123 #optional
     # devices:
     #  - /path/to/device:/path/to/device #optional

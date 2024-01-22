@@ -11,8 +11,6 @@ services:
     depends_on:
       unifi-db:
         condition: service_healthy
-    networks:
-      - unifi
     environment:
       - PUID=1000
       - PGID=1000
@@ -43,8 +41,6 @@ services:
     container_name: unifi-db
     image: docker.io/mongo:3.6
     restart: unless-stopped
-    networks:
-      - unifi
     ports:
      - 27017:27017
     volumes:
@@ -56,7 +52,3 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s
-
-networks:
-  unifi:
-    driver: bridge

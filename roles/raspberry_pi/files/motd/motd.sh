@@ -44,7 +44,7 @@ $W  kernel......: $W`uname -sr`
 $W  arch........: $W`uname -m`
 
 ${B}status:
-$W  ip lan......: $W`ifconfig wlan0 | sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p"`
+$W  ip lan......: $W`ifconfig eth0 | sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p"`
 $W  last login..: $W$LAST_LOGIN_USER | $LAST_LOGIN_TIME | $LAST_LOGIN_IP_ADDRESS
 $W  time........: $W`(date +"%Y-%m-%d %T %Z")`
 $W  uptime......: $W$UPTIME

@@ -91,7 +91,7 @@ services:
 
   loki:
     container_name: loki
-    image: grafana/loki:latest
+    image: grafana/loki:3.5.8 # Pinned version, Loki 3.6.0+ is unable to start on Docker, see: https://github.com/grafana/loki/issues/19966
     restart: unless-stopped
     labels:
       logging: "promtail"

@@ -45,59 +45,43 @@ services:
         logo: "assets/img/truenas.png"
         url: http://192.168.10.3
         target: "_blank"
-      - name: "Router"
-        logo: "assets/img/blocky.svg"
-        url: http://192.168.10.1
-        target: "_blank"
       - name: "Switch"
         logo: "assets/img/traefik.svg"
-        url: http://192.168.10.250
+        url: http://192.168.10.5
+        target: "_blank"
+      - name: "Other"
+        logo: "assets/img/blocky.svg"
+        url: ""
         target: "_blank"
 
   - name: "Services"
     icon: "fas fa-rocket"
     items:
-      - name: "Portainer"
-        logo: "assets/img/portainer.svg"
-        url: http://192.168.10.2:9000
-        target: "_blank"
       - name: "UniFi"
         logo: "assets/img/unifi.png"
-        url: "https://192.168.10.2:8443"
+        url: http://192.168.10.1
         target: "_blank"
       - name: "AdGuard Home"
         logo: "assets/img/adguard-home.svg"
-        url: "http://192.168.1.112:80"
+        url: http://192.168.10.2
+        target: "_blank"
+      - name: "Portainer"
+        logo: "assets/img/portainer.svg"
+        url: http://192.168.10.2:9000
         target: "_blank"
 
   - name: "Monitoring"
     icon: "fas fa-heartbeat"
     items:
-      - name: "Prometheus"
-        logo: "assets/img/prometheus.svg"
-        url: ""
-        target: "_blank"
       - name: "Grafana"
         logo: "assets/img/grafana.svg"
         url: "http://192.168.10.2:3000"
         target: "_blank"
+      - name: "Prometheus"
+        logo: "assets/img/prometheus.svg"
+        url: ""
+        target: "_blank"
       - name: "Uptime Kuma"
         logo: "assets/img/uptime-kuma.svg"
         url: "http://192.168.10.2:3001"
-        target: "_blank"
-
-  - name: "Applications"
-    icon: "fas fa-code-branch"
-    items:
-      - name: "Netflix"
-        logo: "assets/img/netflix.png"
-        url: "https://netflix.com"
-        target: "_blank"
-      - name: "YouTube"
-        logo: "assets/img/youtube.png"
-        url: "https://youtube.com"
-        target: "_blank"
-      - name: "GitHub"
-        logo: "assets/img/github.svg"
-        url: "https://github.com"
         target: "_blank"

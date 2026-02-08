@@ -43,15 +43,15 @@ services:
     items:
       - name: "NAS"
         logo: "assets/img/truenas.png"
-        url: http://192.168.1.3
+        url: http://192.168.10.3
         target: "_blank"
       - name: "Router"
         logo: "assets/img/blocky.svg"
-        url: http://192.168.1.1
+        url: http://192.168.10.1
         target: "_blank"
       - name: "Switch"
         logo: "assets/img/traefik.svg"
-        url: http://192.168.1.2
+        url: http://192.168.10.250
         target: "_blank"
 
   - name: "Services"
@@ -59,11 +59,11 @@ services:
     items:
       - name: "Portainer"
         logo: "assets/img/portainer.svg"
-        url: http://192.168.1.112:9000
+        url: http://192.168.10.2:9000
         target: "_blank"
       - name: "UniFi"
         logo: "assets/img/unifi.png"
-        url: "http://192.168.1.112:8080"
+        url: "https://192.168.10.2:8443"
         target: "_blank"
       - name: "AdGuard Home"
         logo: "assets/img/adguard-home.svg"
@@ -79,11 +79,11 @@ services:
         target: "_blank"
       - name: "Grafana"
         logo: "assets/img/grafana.svg"
-        url: "http://192.168.1.112:3000"
+        url: "http://192.168.10.2:3000"
         target: "_blank"
       - name: "Uptime Kuma"
         logo: "assets/img/uptime-kuma.svg"
-        url: "http://192.168.1.112:3001"
+        url: "http://192.168.10.2:3001"
         target: "_blank"
 
   - name: "Applications"

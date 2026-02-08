@@ -1,6 +1,6 @@
 - name: Add ssh key for admin user
   authorized_key:
-    user: "{{ remote_user }}"
+    user: "{{ ansible_remote_user }}"
     key: "{{ lookup('file', 'files/raspberry_pi.pub') }}"
 
 - name: Generate sshd_config file from template

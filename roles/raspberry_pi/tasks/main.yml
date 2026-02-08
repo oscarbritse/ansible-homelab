@@ -57,7 +57,7 @@
 - name: Add remote user to "docker" group
   tags: docker
   user:
-    name: "{{ remote_user }}"
+    name: "{{ ansible_remote_user }}"
     groups: "{{ docker_group }}"
     append: yes
 
@@ -99,9 +99,9 @@
 # enable memory and I/O usage for containers in prometheus and grafana
 - name: Enable memory and I/O usage for containers in boot file
   ansible.builtin.lineinfile:
-    path: /boot/cmdline.txt
-    regexp: '^console=serial0,115200 console=tty1 root=PARTUUID=4e7f52fd-02 rootfstype=ext4 fsck.repair=yes rootwait$'
-    line: 'systemd.unified_cgroup_hierarchy=0 cgroup_enable=memory cgroup_memory=1 console=serial0,115200 console=tty1 root=PARTUUID=4e7f52fd-02 rootfstype=ext4 fsck.repair=yes rootwait'
+    path: /boot/firmware/cmdline.txt
+    regexp: '^console=serial0,115200 console=tty1 root=PARTUUID=a092253f-02 rootfstype=ext4 fsck.repair=yes rootwait$'
+    line: 'systemd.unified_cgroup_hierarchy=0 cgroup_enable=memory cgroup_memory=1 console=serial0,115200 console=tty1 root=PARTUUID=a092253f-02 rootfstype=ext4 fsck.repair=yes rootwait'
     backrefs: yes
 
 # add fancy motd
@@ -140,6 +140,6 @@
 - name: Add remote user to "video" group
   tags: motd
   user:
-    name: "{{ remote_user }}"
+    name: "{{ ansible_remote_user }}"
     groups: video
     append: yes

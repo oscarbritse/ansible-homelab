@@ -41,19 +41,19 @@
     tags: init
     copy:
       src: files/init/
-      dest: "/home/{{ remote_user }}/init"
+      dest: "/home/{{ ansible_remote_user }}/init"
       owner: root
       group: root
       mode: 0755
 
   - name: Configure locale
     tags: init
-    shell: "/home/{{ remote_user }}/init/configure-locale.sh"
+    shell: "/home/{{ ansible_remote_user }}/init/configure-locale.sh"
 
   - name: Set timezone
     tags: init
-    shell: "/home/{{ remote_user }}/init/set-timezone.sh"
+    shell: "/home/{{ ansible_remote_user }}/init/set-timezone.sh"
 
   - name: Set keyboard layout
     tags: init
-    shell: /home/{{ remote_user }}/init/set-keyboard-layout.sh
+    shell: /home/{{ ansible_remote_user }}/init/set-keyboard-layout.sh

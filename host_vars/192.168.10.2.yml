@@ -1,5 +1,5 @@
 ssh_users: "admin"
 ssh_template_file: sshd_config_debian.j2
-remote_user: admin
+ansible_remote_user: admin
 docker_group: docker
 docker_config_directory: /usr/src/docker

@@ -1,63 +1,127 @@
-# Raspberry Pi & Docker Monitoring
+# Raspberry Pi Monitoring Stack (Docker)
 
-## Introduction
+## Overview
 
-Introducing the Raspberry Pi monitoring solution using Grafana, Prometheus, Cadvisor, and Node-Exporter Stack! This project aims to provide a comprehensive and user-friendly way to monitor the performance of your Raspberry Pi. With Grafana's intuitive dashboards, you can easily visualize system metrics collected by Prometheus and Cadvisor, while Node-Exporter provides valuable information about the Raspberry Pi's hardware and operating system. The combination of these tools results in a powerful and efficient monitoring solution that will give you complete visibility into your system's health. Check out the project and take your Raspberry Pi monitoring to the next level !
+This repository contains a lightweight but powerful **monitoring and logging stack** designed to run on a Raspberry Pi using Docker Compose.  
+It provides **metrics, logs, and dashboards** for both the host system and running containers.
 
-This repository contains a `docker-compose` file to run a Raspberry PI monitoring stack. It is based on the following projects:
-- [Prometheus](https://prometheus.io/)
-- [Grafana](http://grafana.org/)
-- [cAdvisor](https://github.com/google/cadvisor)
-- [NodeExporter](https://github.com/prometheus/node_exporter)
+The stack is well suited for:
+- Raspberry Pi homelabs
+- Low-power ARM systems
+- Single-node Docker environments
+- Configuration managed via Ansible
 
-## Configuration
+### Included components
 
- - Create `data` directories and change the ownership of the `prometheus` and `grafana` folders respectively:
+- **Prometheus** – metrics storage and querying
+- **Grafana** – dashboards and visualization
+- **cAdvisor** – container-level metrics
+- **Node Exporter** – host-level system metrics
+- **Loki** – log aggregation
+- **Alloy** – log and telemetry collection (Grafana Agent successor)
+
+---
+
+## Architecture
+
+At a high level:
+
+- **Node Exporter** exposes host metrics (CPU, memory, disk, network)
+- **cAdvisor** exposes container metrics
+- **Prometheus** scrapes metrics from Node Exporter and cAdvisor
+- **Alloy** collects:
+  - Docker container logs
+  - System logs (journald)
+- **Loki** stores logs received from Alloy
+- **Grafana** visualizes metrics (Prometheus) and logs (Loki)
+
+```
+Node Exporter ─┐
+               ├──> Prometheus ───> Grafana
+cAdvisor  ─────┘
+
+Docker / System Logs ──> Alloy ───> Loki ───> Grafana
+```
+
+---
+
+## Services
+
+### Prometheus
+Prometheus scrapes metrics from Node Exporter and cAdvisor and stores them locally.
+
+- Configuration: `prometheus/prometheus.yml`
+- Data directory: `prometheus/data`
+- Scrape targets use Docker service names
+
+### Grafana
+Grafana provides dashboards for metrics and logs.
+
+- URL: `http://<host-ip>:3000`
+- Default credentials: `admin / admin`
+- Environment variables: `grafana/.env`
+- Provisioning:
+  - Datasources: `grafana/provisioning/datasources`
+  - Dashboards: `grafana/provisioning/dashboards`
+
+### cAdvisor
+cAdvisor exposes container-level metrics such as CPU, memory, filesystem, and network usage.
+
+- Runs in privileged mode
+- Reads Docker and host filesystem metadata
+- Scraped by Prometheus
+
+### Node Exporter
+Node Exporter exposes hardware and OS metrics for the Raspberry Pi host.
+
+- CPU, memory, disk, filesystem, network
+- Uses custom mount paths suitable for Docker
+
+### Loki
+Loki is a log aggregation system optimized for Grafana.
+
+- Receives logs from Alloy
+- Stores logs locally (single-node setup)
+- Version is pinned due to Docker issues in newer releases
+
+### Alloy
+Alloy is Grafana’s unified collector (successor to Grafana Agent).
+
+In this stack, Alloy:
+- Discovers Docker containers via the Docker socket
+- Collects container logs
+- Collects system logs from `journald`
+- Ships logs to Loki
+- Exposes a local debug/UI endpoint
+
+---
+
+## Setup
+
+### Prepare data directories
+
+Create persistent data directories and set correct ownership:
+
 ```bash
-mkdir -p prometheus/data grafana/data && \
+mkdir -p prometheus/data grafana/data alloy/data && \
 sudo chown -R 472:472 grafana/ && \
 sudo chown -R 65534:65534 prometheus/
 ```
 
- - Start the stack with `docker-compose`.
+### Start the stack
+
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-This will start all the containers and make them available on the host machine.
-<br/>The following ports are used (only Grafana is exposed on the host machine):
-- 3000: Grafana
-- 9090: Prometheus
-- 8080: cAdvisor
-- 9100: NodeExporter
+---
 
-The Grafana dashboard can be accessed by navigating to `http://<host-ip>:3000` in your browser.
-<br/>The default username and password are both `admin`. You will be prompted to change the password on the first login.
-<br/>Credentials can be changed by editing the [.env](grafana/.env) file.
+## Exposed Ports
 
-If you would like to change which targets should be monitored, you can edit the [prometheus.yml](prometheus/prometheus.yml) file.
-<br/>The targets section contains a list of all the targets that should be monitored by Prometheus.
-<br/>The names defined in the `job_name` section are used to identify the targets in Grafana.
-<br/>The `static_configs` section contains the IP addresses of the targets that should be monitored. Actually, they are sourced from the service names defined in the [docker-compose.yml](docker-compose.yml) file.
-<br/>If you think that the `scrape_interval` value is too aggressive, you can change it to a more suitable value.
+| Port  | Service     | Description              |
+|------:|-------------|--------------------------|
+| 3000  | Grafana     | Web UI                   |
+| 3100  | Loki        | Loki API                 |
+| 12345 | Alloy       | Alloy debug / UI         |
 
-## Add Data Sources and Dashboards
-
-Since Grafana v5 has introduced the concept of provisioning, it is possible to automatically add data sources and dashboards to Grafana.
-<br/>This is done by placing the `datasources` and `dashboards` directories in the [provisioning](grafana/provisioning) folder. The files in these directories are automatically loaded by Grafana on startup.
-
-If you like to add a new dashboard, simply place the JSON file in the [dashboards](grafana/provisioning/dashboards) directory, and it will be automatically loaded next time Grafana is started.
-
-## Install Dashboard from Grafana.com (Optional)
-
-If you would like to install this dashboard from Grafana.com, simply follow the steps below:
-- Navigate to the dashboard on [Grafana.com Dashboard](https://grafana.com/grafana/dashboards/15120-raspberry-pi-docker-monitoring/)
-- Click on the `Copy ID to Clipboard` button
-- Navigate to the `Import` page in Grafana
-- Paste the ID into the `Import via grafana.com` field
-- Click on the `Load` button
-- Click on the `Import` button
-
-Or you can follow the steps described in the [Grafana Documentation](https://grafana.com/docs/grafana/latest/dashboards/manage-dashboards/#import-a-dashboard).
-
-This dashboard is intended to help you get started with monitoring your Raspberry PI devices.
+Prometheus, Node Exporter, and cAdvisor are **internal only** and not exposed on the host.

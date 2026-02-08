@@ -4,7 +4,7 @@ services:
     container_name: uptime-kuma
     restart: unless-stopped
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     ports:
       - 3001:3001

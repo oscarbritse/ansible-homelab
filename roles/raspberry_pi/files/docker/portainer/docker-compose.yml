@@ -3,7 +3,7 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
       # com.centurylinklabs.watchtower.monitor-only: true
     restart: unless-stopped

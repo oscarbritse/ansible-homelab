@@ -4,7 +4,7 @@ services:
     container_name: adguard-home
     restart: unless-stopped
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     ports:
       - 53:53/tcp # plain DNS

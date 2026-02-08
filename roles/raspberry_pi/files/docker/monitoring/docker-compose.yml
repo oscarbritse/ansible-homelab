@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     user: "472"
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     networks:
       - internal
@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     user: "nobody"
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     networks:
       - internal
@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
     privileged: true
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     networks:
       - internal
@@ -69,7 +69,7 @@ services:
     image: prom/node-exporter:latest
     restart: unless-stopped
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     networks:
       - internal
@@ -92,7 +92,7 @@ services:
     image: grafana/loki:3.5.8 # Pinned version, Loki 3.6.0+ is unable to start on Docker, see: https://github.com/grafana/loki/issues/19966
     restart: unless-stopped
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     networks:
       - internal
@@ -101,21 +101,35 @@ services:
     command:
       - '--config.file=/etc/loki/local-config.yaml'
 
-  promtail:
-    container_name: promtail
-    image: grafana/promtail:latest
+  alloy:
+    container_name: alloy
+    image: grafana/alloy:latest
     restart: unless-stopped
-    labels:
-      logging: "promtail"
-      logging_jobname: "container_logs"
     networks:
       - internal
+    ports:
+      - 12345:12345   # Alloy UI/debug
     volumes:
-      - ./promtail/promtail.yml:/etc/promtail/docker-config.yml
+      # Alloy config
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+
+      # Persist Alloy positions/checkpoints
+      - ./alloy/data:/var/lib/alloy/data
+
+      # Docker logs discovery + reading
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      # Needed by some docker log-reading setups; safe to include
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: 
-      - '--config.file=/etc/promtail/docker-config.yml'
+
+      # Your "system" file scrape
+      - /var/log/journal:/var/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
     depends_on:
       - loki
 

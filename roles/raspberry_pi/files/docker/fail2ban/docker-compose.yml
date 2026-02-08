@@ -4,7 +4,7 @@ services:
     image: lscr.io/linuxserver/fail2ban:latest
     restart: unless-stopped
     labels:
-      logging: "promtail"
+      logging: "alloy"
       logging_jobname: "container_logs"
     cap_add:
       - NET_ADMIN

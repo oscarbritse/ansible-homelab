@@ -1,0 +1,121 @@
+// ./alloy/config.alloy
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+//
+// Send logs to Loki
+//
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+//
+// Discover Docker containers labeled logging=alloy
+//
+discovery.docker "alloy_labeled" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "5s"
+
+  filter {
+    name   = "label"
+    values = ["logging=alloy"]
+  }
+}
+
+//
+// Relabel rules for Docker logs (Promtail relabel_configs equivalent)
+// NOTE: This produces a *capsule* of rules at discovery.relabel.docker_rules.rules
+//
+discovery.relabel "docker_rules" {
+  targets = discovery.docker.alloy_labeled.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_log_stream"]
+    target_label  = "logstream"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_logging_jobname"]
+    target_label  = "job"
+  }
+}
+
+//
+// Process pipeline (Promtail: cri -> multiline -> json(level))
+//
+loki.process "docker_pipeline" {
+  forward_to = [loki.write.local.receiver]
+
+  stage.cri {}
+
+  stage.multiline {
+    firstline     = "^\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}:\\d{2},\\d{3}"
+    max_wait_time = "3s"
+  }
+
+  stage.json {
+    expressions = {
+      level = "level",
+    }
+  }
+}
+
+//
+// Docker log source
+//
+loki.source.docker "docker" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.alloy_labeled.targets
+  relabel_rules = discovery.relabel.docker_rules.rules
+  forward_to    = [loki.process.docker_pipeline.receiver]
+
+  // Optional: extra label (you can remove this block if you don't want it)
+  labels = {
+    scrape_job = "flog_scrape",
+  }
+}
+
+//
+// OPTIONAL journald unit filter relabel rules (capsule output)
+// If you want *all* journald logs, you can delete this entire block
+// and remove relabel_rules from loki.source.journal below.
+//
+discovery.relabel "journal_keep_units" {
+  targets = [
+    { "__journal__systemd_unit" = "" },
+  ]
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    regex         = "(ssh\\.service|systemd-logind\\.service|sudo\\.service|cron\\.service)"
+    action        = "keep"
+  }
+}
+
+//
+// Journald source (replaces your /var/log/secure scrape)
+//
+loki.source.journal "systemd" {
+  path       = "/var/log/journal"
+  forward_to = [loki.write.local.receiver]
+
+  labels = {
+    instance = "raspberrypi",
+    job      = "secure",
+  }
+
+  // If you want *all* journald logs, remove this line and also delete
+  // the discovery.relabel "journal_keep_units" block above.
+  relabel_rules = discovery.relabel.journal_keep_units.rules
+}

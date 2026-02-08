@@ -38,6 +38,9 @@ Setup and configure a homelab on a Raspberry Pi using Ansible.
 
 * Run site script `ansible-playbook site.yml`
 
+* Reboot the Raspberry Pi again
+`sudo reboot`
+
 ## Validation
 
 * Check that the ssh public key has been copied over

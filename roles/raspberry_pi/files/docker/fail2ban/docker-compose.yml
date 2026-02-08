@@ -1,5 +1,3 @@
-version: "3.6"
-
 services:
   fail2ban:
     container_name: fail2ban
